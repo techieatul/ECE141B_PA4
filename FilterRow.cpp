@@ -1,11 +1,11 @@
-#include "Filter.hpp"
+#include "FilterRow.hpp"
 
 
 namespace ECE141{
-    Filter::Filter(){}
-    Filter::~Filter(){}
+    FilterRow::FilterRow(){}
+    FilterRow::~FilterRow(){}
 
-    Filter& Filter::filterOrderBy(DBQuery &aDB,RawRowCollection &theFilteredRow){
+    FilterRow& FilterRow::filterOrderBy(DBQuery &aDB,RawRowCollection &theFilteredRow){
         if(aDB.getOrderBy() != ""){
         // Order the rows ascending
         std::string theOrderBy = aDB.getOrderBy();

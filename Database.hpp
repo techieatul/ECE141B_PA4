@@ -16,7 +16,7 @@
 #include "Entity.hpp"
 #include "Storage.hpp"
 #include "DBQuery.hpp"
-#include "Filter.hpp"
+#include "FilterRow.hpp"
 
 namespace ECE141 {
 

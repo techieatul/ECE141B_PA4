@@ -154,7 +154,7 @@ bool Database::selectRows(DBQuery &aDB, Entity &anEntity,std::ostream &anOutput)
 
 void Database::filterRows(DBQuery &aDB,RawRowCollection &theRow,RawRowCollection &theFilteredRow){
     theFilteredRow.assign(theRow.begin(),theRow.end());
-    Filter* theFilter = new Filter();
+    FilterRow* theFilter = new FilterRow();
 
     if(aDB.getOrderBy() != ""){
         theFilter->filterOrderBy(aDB,theFilteredRow);
