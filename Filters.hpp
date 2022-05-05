@@ -51,7 +51,7 @@ namespace ECE141 {
     bool operator()(KeyValues &aList);
   };
   
-  using Expressions = std::vector<std::unique_ptr<Expression> >;
+  using Expressions = std::vector<std::unique_ptr<Expression>>;
 
   //---------------------------------------------------
 
@@ -65,7 +65,7 @@ namespace ECE141 {
     size_t        getCount() const {return expressions.size();}
     bool          matches(KeyValues &aList) const;
     Filters&      add(Expression *anExpression);
-        
+    Expressions&  getExpression(){return expressions;}
     StatusResult  parse(Tokenizer &aTokenizer, Entity &anEntity);
     
   protected:

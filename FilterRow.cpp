@@ -1,6 +1,7 @@
 #include "FilterRow.hpp"
 
 
+
 namespace ECE141{
     FilterRow::FilterRow(){}
     FilterRow::~FilterRow(){}
@@ -31,4 +32,19 @@ namespace ECE141{
     return *this;
 
     }
-}
+
+    FilterRow& FilterRow::filterWhere(DBQuery &aDB,RawRowCollection &theFilteredRow){
+
+       RawRowCollection::iterator it = theFilteredRow.begin();
+       while(it!=theFilteredRow.end()){
+           if(!(aDB.getFilter().matches((*it).getData()))){
+               it = theFilteredRow.erase(it);
+           }else{
+               it++;
+           }
+       }
+       
+        return *this;
+    }
+
+} 

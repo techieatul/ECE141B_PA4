@@ -155,14 +155,15 @@ bool Database::selectRows(DBQuery &aDB, Entity &anEntity,std::ostream &anOutput)
 void Database::filterRows(DBQuery &aDB,RawRowCollection &theRow,RawRowCollection &theFilteredRow){
     theFilteredRow.assign(theRow.begin(),theRow.end());
     FilterRow* theFilter = new FilterRow();
-
+    
+    if(aDB.getFilter().getCount()>0){
+        theFilter->filterWhere(aDB,theFilteredRow);
+    }
     if(aDB.getOrderBy() != ""){
         theFilter->filterOrderBy(aDB,theFilteredRow);
     }
 
-    if(aDB.getFilter().getCount()>0){
-        
-    }
+    
 
 
     delete theFilter;

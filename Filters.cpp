@@ -9,6 +9,8 @@
 #include "Filters.hpp"
 #include <string>
 #include <limits>
+#include <vector>
+#include <stack>
 #include "keywords.hpp"
 #include "Helpers.hpp"
 #include "Entity.hpp"
@@ -18,6 +20,7 @@
 namespace ECE141 {
   
   using Comparitor = bool (*)(Value &aLHS, Value &aRHS);
+  using StackOpr   = void (*)(std::stack<bool> &aStack);
 
   bool equals(Value &aLHS, Value &aRHS) {
     bool theResult=false;
@@ -30,11 +33,112 @@ namespace ECE141 {
     return theResult;
   }
 
+  bool greater(Value &aLHS, Value &aRHS) {
+    bool theResult=false;
+    
+    std::visit([&](auto const &aLeft) {
+      std::visit([&](auto const &aRight) {
+        theResult=isGreater(aLeft,aRight);
+      },aRHS);
+    },aLHS);
+    return theResult;
+  }
+
+  bool greaterEqual(Value &aLHS, Value &aRHS) {
+    bool theResult=false;
+    
+    std::visit([&](auto const &aLeft) {
+      std::visit([&](auto const &aRight) {
+        theResult=(isGreater(aLeft,aRight) || isEqual(aLeft,aRight));
+      },aRHS);
+    },aLHS);
+    return theResult;
+  }
+
+  bool lesser(Value &aLHS, Value &aRHS) {
+    bool theResult=false;
+    
+    std::visit([&](auto const &aLeft) {
+      std::visit([&](auto const &aRight) {
+        theResult=isLesser(aLeft,aRight);
+      },aRHS);
+    },aLHS);
+    return theResult;
+  }
+
+  bool lesserEqual(Value &aLHS, Value &aRHS) {
+    bool theResult=false;
+    
+    std::visit([&](auto const &aLeft) {
+      std::visit([&](auto const &aRight) {
+        theResult=(isLesser(aLeft,aRight) || isEqual(aLeft,aRight));
+      },aRHS);
+    },aLHS);
+    return theResult;
+  }
+
+  bool notEqual(Value &aLHS, Value &aRHS) {
+    bool theResult=false;
+    
+    std::visit([&](auto const &aLeft) {
+      std::visit([&](auto const &aRight) {
+        theResult=IsnotEqual(aLeft,aRight);
+      },aRHS);
+    },aLHS);
+    return theResult;
+  }
+  
+
+
+
+
+  void logicalAnd(std::stack<bool> &theValStack){
+        bool theFirst = theValStack.top();
+        theValStack.pop();
+        bool theSecond = theValStack.top();
+        theValStack.pop();
+        bool theRes = (theFirst) && (theSecond);
+        theValStack.push(theRes);
+    
+  }
+  
+  void logicalOr(std::stack<bool> &theValStack){
+        bool theFirst = theValStack.top();
+        theValStack.pop();
+        bool theSecond = theValStack.top();
+        theValStack.pop();
+        bool theRes = (theFirst) || (theSecond);
+        theValStack.push(theRes);
+    
+  }
+
+  void logicalNot(std::stack<bool> &theValStack){
+        bool theFirst = theValStack.top();
+        theValStack.pop();
+        bool theRes = !(theFirst);
+        theValStack.push(theRes);
+  }
+  void logicalNoOp(std::stack<bool> &theValStack){
+        return;
+  }
+
+
   static std::map<Operators, Comparitor> comparitors {
     {Operators::equal_op, equals},
+    {Operators::gt_op, greater},
+    {Operators::gte_op, greaterEqual},
+    {Operators::lt_op, lesser},
+    {Operators::lte_op, lesserEqual},
+    {Operators::notequal_op, notEqual},
     //STUDENT: Add more for other operators...
   };
 
+  static std::map<Logical,StackOpr> stackOpr {
+    {Logical::and_op, logicalAnd},
+    {Logical::or_op, logicalOr},
+    {Logical::not_op, logicalNot},
+    {Logical::no_op, logicalNoOp}
+  };
   bool Expression::operator()(KeyValues &aList) {
     Value theLHS{lhs.value};
     Value theRHS{rhs.value};
@@ -74,12 +178,37 @@ namespace ECE141 {
     //         logical combinations (AND, OR, NOT):
     //         like:  WHERE zipcode=92127 AND age>20
     
+    std::vector<bool> theValMatch;
+    std::vector<Logical> theLogicalOpr; 
     for(auto &theExpr : expressions) {
-      if(!(*theExpr)(aList)) {
+      bool theResult = (*theExpr)(aList);
+      theValMatch.push_back(theResult);
+      theLogicalOpr.push_back((*theExpr).logic);
+    }
+    if(theValMatch.size()==1 && theLogicalOpr[0]==Logical::no_op){
+      return theValMatch[0];
+    }
+
+    // if there are more vector elements then that mean we also must have logical operators
+    // push all elements to stack
+    std::stack<bool> theValStack;
+    for (auto it = theValMatch.rbegin(); it != theValMatch.rend(); ++it) {
+      theValStack.push(*it);
+    }
+
+    // Do the logic here
+    for(const auto &it: theLogicalOpr){
+      if(stackOpr.count(it)) {
+        stackOpr[it];
+      }else{
         return false;
       }
+
+      
     }
-    return true;
+    bool theFinalRes = theValStack.top();
+    theValStack.pop();
+    return theFinalRes;
   }
  
 
@@ -92,7 +221,7 @@ namespace ECE141 {
       if(auto *theAttr=anEntity.getAttribute(theToken.data)) {
         anOperand.ttype=theToken.type;
         anOperand.name=theToken.data; //hang on to name...
-        anOperand.entityId=Entity::hashString(theToken.data);
+        anOperand.entityId=Helpers::hashString(theToken.data.c_str());
         anOperand.dtype=theAttr->getType();
       }
       else {
@@ -158,4 +287,30 @@ namespace ECE141 {
   }
 
 }
+
+
+// if(it == Logical::and_op){
+      //   bool theFirst = theValStack.top();
+      //   theValStack.pop();
+      //   bool theSecond = theValStack.top();
+      //   theValStack.pop();
+      //   bool theRes = (theFirst) && (theSecond);
+      //   theValStack.push(theRes);
+
+      // }else if(it == Logical::or_op){
+      //   bool theFirst = theValStack.top();
+      //   theValStack.pop();
+      //   bool theSecond = theValStack.top();
+      //   theValStack.pop();
+      //   bool theRes = (theFirst) || (theSecond);
+      //   theValStack.push(theRes);
+
+      // }else if(it == Logical::not_op){
+      //   bool theFirst = theValStack.top();
+      //   theValStack.pop();
+      //   bool theRes = !(theFirst);
+      //   theValStack.push(theRes);
+      // }else{
+      //   continue;
+      // }
 

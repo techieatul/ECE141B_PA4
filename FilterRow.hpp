@@ -7,6 +7,7 @@
 #include "BasicTypes.hpp"
 #include "DBQuery.hpp"
 #include "Filters.hpp"
+#include "keywords.hpp"
 namespace ECE141 {
 
 class FilterRow {
