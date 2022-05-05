@@ -6,6 +6,7 @@
 #include <vector>
 #include "BasicTypes.hpp"
 #include "DBQuery.hpp"
+#include "Filters.hpp"
 namespace ECE141 {
 
 class FilterRow {
@@ -14,7 +15,7 @@ class FilterRow {
     ~FilterRow();
     FilterRow& filterOrderBy(DBQuery &aDB,RawRowCollection &theFilteredRow);
     FilterRow& filterLimit();
-    FilterRow& filterWhere();
+    FilterRow& filterWhere(DBQuery &aDB,RawRowCollection &theFilteredRow);
 };
 
 }  // namespace ECE141

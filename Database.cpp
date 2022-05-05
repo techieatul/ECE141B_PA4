@@ -160,6 +160,11 @@ void Database::filterRows(DBQuery &aDB,RawRowCollection &theRow,RawRowCollection
         theFilter->filterOrderBy(aDB,theFilteredRow);
     }
 
+    if(aDB.getFilter().getCount()>0){
+        
+    }
+
+
     delete theFilter;
     
 }

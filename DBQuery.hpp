@@ -9,6 +9,7 @@
 #include "Row.hpp"
 #include "Entity.hpp"
 #include "Tokenizer.hpp"
+#include "Filters.hpp"
 
 namespace ECE141
 {
@@ -27,6 +28,7 @@ namespace ECE141
     Entity*     getEntity() { return theEntity; };
     std::string&    getOrderBy(){ return theOrderBy;}
     bool         getIsAscending(){return isAscending;}
+    Filters&     getFilter(){return theFilter;}
    
     DBQuery& setAllField(bool aValue);
     DBQuery& setAttr(const std::string &aField);
@@ -35,6 +37,7 @@ namespace ECE141
     DBQuery& setOrderBy(std::string &anOrderBy);
     DBQuery& setIsAcending(bool &anAsc);
 
+
   protected:
     std::string theEntityName;
     Entity*     theEntity;
@@ -42,6 +45,7 @@ namespace ECE141
     bool        theAllField;
     std::string theOrderBy;
     bool        isAscending;
+    Filters     theFilter;
   };
 } // namespace ECE141
 
