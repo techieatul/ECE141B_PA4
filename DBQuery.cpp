@@ -2,7 +2,7 @@
 
 namespace ECE141
 {
-  DBQuery::DBQuery() : theEntityName(""), theAllField(false), theEntity(nullptr),theOrderBy(""),isAscending(true) {}
+  DBQuery::DBQuery() : theEntityName(""), theAllField(false), theEntity(nullptr),theOrderBy(""),isAscending(true),theLimit(-1) {}
 
   DBQuery::DBQuery(const DBQuery &aCopy) {
     *this = aCopy;
