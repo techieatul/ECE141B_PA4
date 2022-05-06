@@ -174,9 +174,7 @@ namespace ECE141 {
   //compare expressions to row; return true if matches
   bool Filters::matches(KeyValues &aList) const {
     
-    //STUDENT: You'll need to add code here to deal with
-    //         logical combinations (AND, OR, NOT):
-    //         like:  WHERE zipcode=92127 AND age>20
+   
     
     std::vector<bool> theValMatch;
     std::vector<Logical> theLogicalOpr; 

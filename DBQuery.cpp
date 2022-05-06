@@ -34,6 +34,10 @@ namespace ECE141
     theAttr.push_back(aField);
     return *this;
   }  
+  DBQuery& DBQuery::setLimit(int &aLimit){
+    this->theLimit = aLimit;
+    return *this;
+  }
 
   DBQuery& DBQuery::setEntityName(const std::string &aName){
     theEntityName = aName;

@@ -29,6 +29,7 @@ namespace ECE141
     std::string&    getOrderBy(){ return theOrderBy;}
     bool         getIsAscending(){return isAscending;}
     Filters&     getFilter(){return theFilter;}
+    int          getLimit(){return theLimit;}
    
     DBQuery& setAllField(bool aValue);
     DBQuery& setAttr(const std::string &aField);
@@ -36,6 +37,7 @@ namespace ECE141
     DBQuery& setEntity(Entity *anEntity);
     DBQuery& setOrderBy(std::string &anOrderBy);
     DBQuery& setIsAcending(bool &anAsc);
+    DBQuery& setLimit(int &aLimit);
 
 
   protected:
@@ -46,6 +48,7 @@ namespace ECE141
     std::string theOrderBy;
     bool        isAscending;
     Filters     theFilter;
+    int         theLimit;
   };
 } // namespace ECE141
 
