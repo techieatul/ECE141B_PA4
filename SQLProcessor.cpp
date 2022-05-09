@@ -398,7 +398,10 @@ Statement *SQLProcessor::handleSqlStatements(Tokenizer &aTokenizer) {
                 theEntity->decodeBlock(theDescribeBlock);
             }
             SelectStatement *theSelectStatememt = new SelectStatement(Keywords::select_kw, theEntity);
-            StatusResult     theStatus = theSelectStatememt->parseStatement(aTokenizer);
+            // Restart the token Index
+            // Atul added
+            aTokenizer.restart();
+            StatusResult theStatus = theSelectStatememt->parseStatement(aTokenizer);
             return theSelectStatememt;
         }
         default:
