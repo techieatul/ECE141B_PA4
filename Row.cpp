@@ -15,6 +15,7 @@
 #include <utility>
 #include <variant>
 #include <vector>
+#include <regex>
 
 #include "BasicTypes.hpp"
 #include "Helpers.hpp"
@@ -88,7 +89,8 @@ void Row::encode(Block &aBlock) {
         ss << key << " ";
         std::visit([&ss](const auto &elem) { ss << elem << " "; }, val);
         std::string valType = KeyValueToString[val.index()];
-        ss << valType << " ";
+        //ss << valType << " ";
+        ss <<"Type"<<" "<<valType << " ";
     }
     ss << "END"<<" ";
     // Entity id(not null) first_name(nullable) last_name(nullable) email(not
@@ -109,7 +111,17 @@ void Row::decode(Block &aBlock) {
     this->setBlockNumber(aBlock.header.theBlockId);
     this->entityId = aBlock.header.theTableNameHash;
     while (theStream >> theKey && theKey!="END") {
-        theStream >> theVal >> theValtype;
+        std::stringstream aStream;
+       
+        while(theStream>>theVal && theVal!="Type"){
+           aStream<<theVal<<" ";
+        }
+
+       theVal = aStream.str();
+       theVal = std::regex_replace(theVal, std::regex("\\s+$"), std::string(""));
+
+        theStream >> theValtype;
+        
         if (theValtype == "S") {
             this->set(theKey, std::string(theVal));
 

@@ -476,7 +476,6 @@ StatusResult SQLProcessor::showQuery(DBQuery &aDBQuery) {
     Entity *theEntity = new Entity(aDBQuery.getEntityName());
     //(*currentActiveDbPtr)->selectRows(aDBQuery.getEntityName(),*theEntity);
     (*currentActiveDbPtr)->selectRows(aDBQuery, *theEntity, output);
-    RowCollection &theRow = (*currentActiveDbPtr)->selectRowPtr(aDBQuery, *theEntity, output);
     delete theEntity;
     return StatusResult(Errors::noError);
 }
