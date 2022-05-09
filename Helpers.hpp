@@ -13,6 +13,7 @@
 
 #include "BasicTypes.hpp"
 #include "keywords.hpp"
+#include <sstream>
 
 namespace ECE141 {
 

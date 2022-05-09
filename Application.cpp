@@ -80,6 +80,9 @@ namespace ECE141 {
   //build a tokenizer, tokenize input, ask processors to handle...
   StatusResult Application::handleInput(std::istream &anInput){
     Tokenizer theTokenizer(anInput);
+    
+    
+    
     StatusResult theResult=theTokenizer.tokenize();
     while (theResult && theTokenizer.more()) {
       //Keywords k = theTokenizer.current().keyword;
