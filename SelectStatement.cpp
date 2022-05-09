@@ -126,6 +126,7 @@ StatusResult SelectStatement::parseSelect(Tokenizer &aTokenizer) {
     }
 
     // Means we have atleast one field
+    // bug "invalid offset"
     while (aTokenizer.peek(aTokenizer.getIndex() + 1).keyword != Keywords::from_kw) {
         this->theDBQuery.setAttr(aTokenizer.current().data);
         aTokenizer.next(2);
