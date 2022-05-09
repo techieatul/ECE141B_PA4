@@ -109,7 +109,8 @@ bool SQLStatement::parseValueList(StringList &aList, Tokenizer &aTokenizer) {
                     ss << theData.at(i);
                 }
             }
-
+            // Author C,
+            // I,I,puch
             theData = ss.str();
             aList.push_back(theData);
 

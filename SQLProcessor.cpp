@@ -14,10 +14,10 @@
 #include "Config.hpp"
 #include "Database.hpp"
 #include "Entity.hpp"
-#include "SQLStatement.hpp"
-#include "Tokenizer.hpp"
 #include "Helpers.hpp"
 #include "Row.hpp"
+#include "SQLStatement.hpp"
+#include "Tokenizer.hpp"
 namespace ECE141 {
 
 SQLProcessor::SQLProcessor(std::ostream &anOutput,
@@ -185,22 +185,20 @@ bool checkInsertTable(Tokenizer aTokenizer) {
     return true;
 }
 
-
 bool checkSelectTable(Tokenizer aTokenizer) {
     Token              theSelectToken{TokenType::keyword, Keywords::select_kw,
-                       Operators::unknown_op, "select"};
+                         Operators::unknown_op, "select"};
     Token              theFromToken{TokenType::keyword, Keywords::from_kw,
-                         Operators::unknown_op, "from"};
+                       Operators::unknown_op, "from"};
     Token              theTableToken{TokenType::identifier, Keywords::unknown_kw,
-                         Operators::unknown_op, "table_name"};                     
-                    
+                        Operators::unknown_op, "table_name"};
 
     std::vector<Token> SQLVector;
     SQLVector.push_back(theSelectToken);
     SQLVector.push_back(theFromToken);
     SQLVector.push_back(theTableToken);
     // It has to be atleast SELECT * FROM Table_name
-    if(aTokenizer.size()<4){
+    if (aTokenizer.size() < 4) {
         return false;
     }
     bool checkSelect = false;
@@ -210,28 +208,25 @@ bool checkSelectTable(Tokenizer aTokenizer) {
             (SQLVector.at(i).type != aTokenizer.current().type)) {
             return false;
         }
-       
-        if(!checkSelect && aTokenizer.peek(1).data == "*"){
-            checkSelect=true;
+
+        if (!checkSelect && aTokenizer.peek(1).data == "*") {
+            checkSelect = true;
             aTokenizer.next();
-        }else{
+        } else {
             // check if we have like this identifier_kw,identifier_kw,identifier_kw
-            if(!checkSelect){
+            if (!checkSelect) {
                 int tokenIdx = 1;
-                while(!checkSelect && aTokenizer.more() && aTokenizer.peek(tokenIdx+1).data != "from"){
+                while (!checkSelect && aTokenizer.more() && aTokenizer.peek(tokenIdx + 1).data != "from") {
                     aTokenizer.next();
-                    if(aTokenizer.current().type != TokenType::identifier){
+                    if (aTokenizer.current().type != TokenType::identifier) {
                         return false;
                     }
                     aTokenizer.skipTo(',');
-                    tokenIdx = aTokenizer.getIndex()+1;
+                    tokenIdx = aTokenizer.getIndex() + 1;
                 }
-                checkSelect=true;
+                checkSelect = true;
                 aTokenizer.next();
-
             }
-            
-
         }
 
         aTokenizer.next();
@@ -239,8 +234,6 @@ bool checkSelectTable(Tokenizer aTokenizer) {
 
     return true;
 }
-
-
 
 CmdProcessor *SQLProcessor::recognizes(Tokenizer &aTokenizer) {
     switch (aTokenizer.current().keyword) {
@@ -276,16 +269,15 @@ CmdProcessor *SQLProcessor::recognizes(Tokenizer &aTokenizer) {
             }
             break;
         case Keywords::select_kw:
-             if(checkSelectTable(aTokenizer)){
-                 SQLProcessor::keywordStatement = Keywords::select_kw;
-                 return this;
-             }
-        
+            if (checkSelectTable(aTokenizer)) {
+                SQLProcessor::keywordStatement = Keywords::select_kw;
+                return this;
+            }
+
         default:
-             return nullptr;
+            return nullptr;
     }
 }
-
 
 // No longer used. See makeStatement for further comments
 void handleSQL(Tokenizer &aTokenizer, SQLStatement **aSQLStatement) {
@@ -394,9 +386,19 @@ Statement *SQLProcessor::handleSqlStatements(Tokenizer &aTokenizer) {
             delete theEntity;
             return theInsertTable;
         }
-        case Keywords::select_kw:{
-            SelectStatement* theSelectStatememt = new SelectStatement(Keywords::select_kw);
-            StatusResult theStatus = theSelectStatememt->parseStatement(aTokenizer);
+        case Keywords::select_kw: {
+            aTokenizer.skipTo(TokenType::identifier);
+            Block    theDescribeBlock;
+            uint32_t theBlockNum = (*currentActiveDbPtr)->getEntityFromMap(aTokenizer.current().data);
+            (*currentActiveDbPtr)->getStorage().readBlock(theBlockNum, theDescribeBlock);
+            Entity *theEntity;
+
+            if (theDescribeBlock.header.theTitle == aTokenizer.current().data) {
+                theEntity = new Entity(aTokenizer.current().data);
+                theEntity->decodeBlock(theDescribeBlock);
+            }
+            SelectStatement *theSelectStatememt = new SelectStatement(Keywords::select_kw, theEntity);
+            StatusResult     theStatus = theSelectStatememt->parseStatement(aTokenizer);
             return theSelectStatememt;
         }
         default:
@@ -469,15 +471,14 @@ StatusResult SQLProcessor::run(Statement *aStmt) {
     return theStatus;
 }
 
-StatusResult SQLProcessor::showQuery(DBQuery &aDBQuery){
+StatusResult SQLProcessor::showQuery(DBQuery &aDBQuery) {
     // Get vector of Rows
-    Entity* theEntity = new Entity(aDBQuery.getEntityName());
+    Entity *theEntity = new Entity(aDBQuery.getEntityName());
     //(*currentActiveDbPtr)->selectRows(aDBQuery.getEntityName(),*theEntity);
-    (*currentActiveDbPtr)->selectRows(aDBQuery,*theEntity,output);
-    RowCollection& theRow = (*currentActiveDbPtr)->selectRowPtr(aDBQuery,*theEntity,output);
+    (*currentActiveDbPtr)->selectRows(aDBQuery, *theEntity, output);
+    RowCollection &theRow = (*currentActiveDbPtr)->selectRowPtr(aDBQuery, *theEntity, output);
     delete theEntity;
     return StatusResult(Errors::noError);
-
 }
 
 // To handle INSERT INTO statement
@@ -494,26 +495,25 @@ StatusResult SQLProcessor::insertTable(const std::string &aName) {
     uint32_t theBlockCount = (*currentActiveDbPtr)->getBlockCount();
     (*currentActiveDbPtr)->getStorage().readBlock(theBlockNum, *theDescribeBlock);
     theEntity->decodeBlock(*theDescribeBlock);
-    const  Attribute* theAttr = theEntity->getPrimaryKey();
-    std::string thePrimaryKey = "";
-    if(theAttr!=nullptr){
+    const Attribute *theAttr = theEntity->getPrimaryKey();
+    std::string      thePrimaryKey = "";
+    if (theAttr != nullptr) {
         thePrimaryKey = theAttr->getName();
     }
-    
+
     delete theDescribeBlock;
     for (size_t i = 0; i < this->theRowData.size(); i++) {
         // blockify each row. The getBlock function in Row.cpp
-    
-        Block* theRowBlock = new Block(BlockType::data_block);
+
+        Block   *theRowBlock = new Block(BlockType::data_block);
         uint32_t theRowId = theEntity->getAutoIncr();
 
         //////////////////////////////////////////
-        //Seeting the Autoincr id for primary Key
-        
-        if(thePrimaryKey!=""){
-            Value thePrimaryValue = (int) theRowId;
-            theRowData.at(i).set(thePrimaryKey,thePrimaryValue);
+        // Seeting the Autoincr id for primary Key
 
+        if (thePrimaryKey != "") {
+            Value thePrimaryValue = (int)theRowId;
+            theRowData.at(i).set(thePrimaryKey, thePrimaryValue);
         }
 
         ///////////////////////////////////////////
@@ -521,7 +521,7 @@ StatusResult SQLProcessor::insertTable(const std::string &aName) {
         theRowBlock->header.theBlockId = theRowId;
         theRowBlock->header.theTableNameHash = Helpers::hashString(aName.c_str());
         this->theRowData.at(i).getBlock(*theRowBlock);
-        (*currentActiveDbPtr)->getStorage().writeBlock(theBlockCount,*theRowBlock);  // Should it be blockCount-1?? Check later
+        (*currentActiveDbPtr)->getStorage().writeBlock(theBlockCount, *theRowBlock);  // Should it be blockCount-1?? Check later
 
         theEntity->insertDataRow(theBlockCount);
         theRowId++;
@@ -530,14 +530,14 @@ StatusResult SQLProcessor::insertTable(const std::string &aName) {
         theBlockCount++;
         (*currentActiveDbPtr)->setBlockCount(theBlockCount);
 
-        //delete theRowBlock;
+        // delete theRowBlock;
     }
     // Encode the entity block back
     Block theEntityBlock = theEntity->getBlock();
     (*currentActiveDbPtr)->getStorage().writeBlock(theBlockNum, theEntityBlock);
 
     delete theEntity;
-    output<<"Query Ok, "<<this->theRowData.size()<<" rows affected ("<< Config::getTimer().elapsed()<<" secs)"<<std::endl;
+    output << "Query Ok, " << this->theRowData.size() << " rows affected (" << Config::getTimer().elapsed() << " secs)" << std::endl;
     return StatusResult(Errors::noError);
 }
 
@@ -573,12 +573,12 @@ StatusResult SQLProcessor::createTable(Entity *anEntity) {
     theConvertedBlock.header.theTableNameHash = Helpers::hashString(anEntity->getName().c_str());
     anEntity->setEntityHashString(theConvertedBlock.header.theTableNameHash);
     // For entity theEntityId is the current value of the auto_incr field
-    
+
     theConvertedBlock.header.theEntityId = anEntity->getAutoIncr();
 
     uint32_t theBlockNum = (*currentActiveDbPtr)->getBlockCount();
     (*currentActiveDbPtr)->getStorage().writeBlock(theBlockNum, theConvertedBlock);
-    uint32_t theNewBlockCount =theBlockNum + 1;  // new block count will old + 1
+    uint32_t theNewBlockCount = theBlockNum + 1;  // new block count will old + 1
     (*currentActiveDbPtr)->setBlockCount(theNewBlockCount);
     (*currentActiveDbPtr)->setChange(true);
     output << "Query OK, 1 row affected";
