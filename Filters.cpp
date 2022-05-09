@@ -214,13 +214,15 @@ namespace ECE141 {
   StatusResult parseOperand(Tokenizer &aTokenizer,
                             Entity &anEntity, Operand &anOperand) {
     StatusResult theResult{noError};
+    std::string theEntityName = anEntity.getName();
     Token &theToken = aTokenizer.current();
     if(TokenType::identifier==theToken.type) {
       if(auto *theAttr=anEntity.getAttribute(theToken.data)) {
         anOperand.ttype=theToken.type;
         anOperand.name=theToken.data; //hang on to name...
-        anOperand.entityId=Helpers::hashString(theToken.data.c_str());
+        anOperand.entityId=Helpers::hashString(theEntityName.c_str());
         anOperand.dtype=theAttr->getType();
+        anOperand.entityName = theEntityName;
       }
       else {
         anOperand.ttype=TokenType::string;

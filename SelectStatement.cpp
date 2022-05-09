@@ -48,10 +48,11 @@ StatusResult SelectStatement::parseStatement(Tokenizer &aTokenizer) {
     aTokenizer.next();  // TableName
     this->theDBQuery.setEntityName(aTokenizer.current().data);
     aTokenizer.next();
-    Filters thefilters;
+    //Filters thefilters;
     while (aTokenizer.more() && aTokenizer.current().data != ";") {
         switch (aTokenizer.current().keyword) {
             case Keywords::where_kw:
+                this->theDBQuery.setFilterKey(Keywords::where_kw);
                 // aTokenizer.next(1);  // skip where
                 // while (aTokenizer.more() && aTokenizer.current().data != ";") {
                 //     // LHS
@@ -86,13 +87,17 @@ StatusResult SelectStatement::parseStatement(Tokenizer &aTokenizer) {
                 //     thefilters.add(new Expression(theLHS, theOps, theRHS, thelogic));
                 // }
 
-                theStatus = thefilters.parse(aTokenizer, *entity);
+                
+                // Skip where
+                aTokenizer.next();
+                theStatus = this->theDBQuery.getFilter().parse(aTokenizer, *entity);
                 if (!theStatus) {
                     return StatusResult(theStatus.error);
                 }
                 break;
 
             case Keywords::order_kw:
+                this->theDBQuery.setFilterKey(Keywords::order_kw);
                 aTokenizer.next();  // by
                 if (aTokenizer.current().type == TokenType::keyword && aTokenizer.current().keyword == Keywords::by_kw) {
                     aTokenizer.next();  // should be fields
@@ -103,6 +108,7 @@ StatusResult SelectStatement::parseStatement(Tokenizer &aTokenizer) {
                 }
                 break;
             case Keywords::limit_kw:
+                this->theDBQuery.setFilterKey(Keywords::limit_kw);
                 aTokenizer.next();
                 if (aTokenizer.current().type == TokenType::number) {
                     int thelimit = std::stoi(aTokenizer.current().data);

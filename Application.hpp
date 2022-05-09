@@ -28,7 +28,7 @@ class Application : public CmdProcessor {
     virtual ~Application();
 
     // app api...
-    std::string          getVersion() { return "0.5"; }
+    std::string          getVersion() { return "0.6"; }
 
     virtual StatusResult handleInput(std::istream &anInput);
     CmdProcessor        *recognizes(Tokenizer &aTokenizer) override;

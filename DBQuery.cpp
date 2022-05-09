@@ -49,6 +49,11 @@ namespace ECE141
     return *this;
   }
 
+  DBQuery& DBQuery::setFilterKey(const Keywords &aKey){
+    theFilterKey.push_back(aKey);
+    return *this;
+  }
+
  
 
 } // namespace ECE141

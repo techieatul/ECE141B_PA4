@@ -25,7 +25,7 @@ namespace ECE141 {
   struct Operand {
     Operand() {}
     Operand(std::string &aName, TokenType aType, Value &aValue, size_t anId=0)
-      : ttype(aType), dtype(DataTypes::varchar_type), name(aName),
+      : ttype(aType), dtype(DataTypes::varchar_type), name(aName), entityName(""),
         value(aValue), entityId(anId) {}
     
     TokenType   ttype; //is it a field, or const (#, string)...
@@ -33,6 +33,7 @@ namespace ECE141 {
     std::string name;  //attr name
     Value       value;
     size_t      entityId;
+    std::string entityName;
   };
   
   //---------------------------------------------------

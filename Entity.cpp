@@ -41,7 +41,13 @@ namespace ECE141 {
     return *this;
   }
 
-  Attribute* Entity::getAttribute(const std::string &aName) const {
+  const Attribute* Entity::getAttribute(const std::string &aName) const {
+    for(int i = 0; i<this->attributes.size();i++){
+      if(attributes.at(i).getName() == aName){
+        return &attributes.at(i);
+      }
+
+    } 
     return nullptr;
   }
   

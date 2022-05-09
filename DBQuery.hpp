@@ -10,7 +10,8 @@
 #include "Entity.hpp"
 #include "Tokenizer.hpp"
 #include "Filters.hpp"
-
+#include "keywords.hpp"
+using FilterKeyword = std::vector<ECE141::Keywords>;
 namespace ECE141
 {
   class DBQuery
@@ -30,7 +31,8 @@ namespace ECE141
     bool         getIsAscending(){return isAscending;}
     Filters&     getFilter(){return theFilter;}
     int          getLimit(){return theLimit;}
-   
+    FilterKeyword getFilterKey(){return theFilterKey;}
+
     DBQuery& setAllField(bool aValue);
     DBQuery& setAttr(const std::string &aField);
     DBQuery& setEntityName(const std::string &aName);
@@ -38,12 +40,14 @@ namespace ECE141
     DBQuery& setOrderBy(std::string &anOrderBy);
     DBQuery& setIsAcending(bool &anAsc);
     DBQuery& setLimit(int &aLimit);
+    DBQuery& setFilterKey(const Keywords &aKey);
 
 
   protected:
     std::string theEntityName;
     Entity*     theEntity;
     StringList  theAttr;
+    FilterKeyword theFilterKey;
     bool        theAllField;
     std::string theOrderBy;
     bool        isAscending;
