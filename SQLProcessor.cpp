@@ -395,8 +395,18 @@ Statement *SQLProcessor::handleSqlStatements(Tokenizer &aTokenizer) {
             return theInsertTable;
         }
         case Keywords::select_kw:{
-            SelectStatement* theSelectStatememt = new SelectStatement(Keywords::select_kw);
-            StatusResult theStatus = theSelectStatememt->parseStatement(aTokenizer);
+            aTokenizer.skipTo(TokenType::identifier);
+            Block    theDescribeBlock;
+            uint32_t theBlockNum = (*currentActiveDbPtr)->getEntityFromMap(aTokenizer.current().data);
+            (*currentActiveDbPtr)->getStorage().readBlock(theBlockNum, theDescribeBlock);
+            Entity *theEntity;
+
+            if (theDescribeBlock.header.theTitle == aTokenizer.current().data) {
+                theEntity = new Entity(aTokenizer.current().data);
+                theEntity->decodeBlock(theDescribeBlock);
+            }
+            SelectStatement *theSelectStatememt = new SelectStatement(Keywords::select_kw, theEntity);
+            StatusResult     theStatus = theSelectStatememt->parseStatement(aTokenizer);
             return theSelectStatememt;
         }
         default:
@@ -474,7 +484,7 @@ StatusResult SQLProcessor::showQuery(DBQuery &aDBQuery){
     Entity* theEntity = new Entity(aDBQuery.getEntityName());
     //(*currentActiveDbPtr)->selectRows(aDBQuery.getEntityName(),*theEntity);
     (*currentActiveDbPtr)->selectRows(aDBQuery,*theEntity,output);
-    RowCollection& theRow = (*currentActiveDbPtr)->selectRowPtr(aDBQuery,*theEntity,output);
+    //RowCollection& theRow = (*currentActiveDbPtr)->selectRowPtr(aDBQuery,*theEntity,output);
     delete theEntity;
     return StatusResult(Errors::noError);
 
