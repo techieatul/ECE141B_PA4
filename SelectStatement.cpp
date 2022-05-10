@@ -53,41 +53,8 @@ StatusResult SelectStatement::parseStatement(Tokenizer &aTokenizer) {
         switch (aTokenizer.current().keyword) {
             case Keywords::where_kw:
                 this->theDBQuery.setFilterKey(Keywords::where_kw);
-                // aTokenizer.next(1);  // skip where
-                // while (aTokenizer.more() && aTokenizer.current().data != ";") {
-                //     // LHS
-                //     Operand theLHS;
-                //     if (!this->parseOperand(aTokenizer, theLHS)) {
-                //         return StatusResult(Errors::syntaxError);
-                //     }
-                //     // todo : entity id
-
-                //     // Operator
-                //     aTokenizer.next();
-                //     Operators theOps = Helpers::toOperator(aTokenizer.current().data);
-                //     if (theOps == Operators::unknown_op) {
-                //         return StatusResult(Errors::syntaxError);
-                //     }
-                //     // RHS
-                //     aTokenizer.next();
-                //     Operand theRHS;
-                //     if (!this->parseOperand(aTokenizer, theRHS)) {
-                //         return StatusResult(Errors::syntaxError);
-                //     }
-                //     Logical thelogic = Logical::no_op;
-                //     aTokenizer.next();
-                //     if (aTokenizer.current().keyword == Keywords::add_kw) {
-                //         thelogic = Logical::and_op;
-                //     } else if (aTokenizer.current().keyword == Keywords::or_kw) {
-                //         thelogic = Logical::or_op;
-                //     } else if (aTokenizer.current().keyword == Keywords::not_kw) {
-                //         thelogic = Logical::not_op;
-                //     }
-
-                //     thefilters.add(new Expression(theLHS, theOps, theRHS, thelogic));
-                // }
-
                 
+
                 // Skip where
                 aTokenizer.next();
                 theStatus = this->theDBQuery.getFilter().parse(aTokenizer, *entity);
@@ -113,6 +80,7 @@ StatusResult SelectStatement::parseStatement(Tokenizer &aTokenizer) {
                 if (aTokenizer.current().type == TokenType::number) {
                     int thelimit = std::stoi(aTokenizer.current().data);
                     this->theDBQuery.setLimit(thelimit);
+                    aTokenizer.next();
                 } else {
                     return StatusResult(Errors::syntaxError);
                 }
@@ -133,7 +101,7 @@ StatusResult SelectStatement::parseSelect(Tokenizer &aTokenizer) {
 
     // Means we have atleast one field
     // bug "invalid offset"
-    while (aTokenizer.peek(aTokenizer.getIndex() + 1).keyword != Keywords::from_kw) {
+    while (aTokenizer.peek(1).keyword != Keywords::from_kw) {
         this->theDBQuery.setAttr(aTokenizer.current().data);
         aTokenizer.next(2);
     }
@@ -142,4 +110,7 @@ StatusResult SelectStatement::parseSelect(Tokenizer &aTokenizer) {
 
     return StatusResult(Errors::noError);
 }
-}  // namespace ECE141
+
+} // namespace ECE141
+
+

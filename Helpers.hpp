@@ -353,6 +353,22 @@ class Helpers {
         }
         return ss.str();
     }
+
+
+    static Logical convertKeyWordToLogical(Keywords &akw){
+        switch (akw){
+            case Keywords::and_kw:
+                 return Logical::and_op;
+
+            case Keywords::or_kw:
+                 return Logical::or_op;
+
+            case Keywords::not_kw:
+                 return Logical::not_op;
+            default:
+                 return Logical::unknown_op;
+        }
+    }
 };
 
 }  // namespace ECE141

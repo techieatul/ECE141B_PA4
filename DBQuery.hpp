@@ -35,6 +35,7 @@ namespace ECE141
 
     DBQuery& setAllField(bool aValue);
     DBQuery& setAttr(const std::string &aField);
+    DBQuery& setAttrPrimary(const std::string &aField);
     DBQuery& setEntityName(const std::string &aName);
     DBQuery& setEntity(Entity *anEntity);
     DBQuery& setOrderBy(std::string &anOrderBy);

@@ -34,6 +34,11 @@ namespace ECE141
     theAttr.push_back(aField);
     return *this;
   }  
+
+  DBQuery& DBQuery::setAttrPrimary(const std::string &aField){
+    theAttr.insert(theAttr.begin(),aField);
+    return *this;
+  }
   DBQuery& DBQuery::setLimit(int &aLimit){
     this->theLimit = aLimit;
     return *this;

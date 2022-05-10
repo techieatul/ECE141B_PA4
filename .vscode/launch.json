@@ -10,7 +10,7 @@
 			"type": "lldb",
 			"request": "launch",
 			"name": "clang++ build active file",
-			"program": "${workspaceFolder}/pa5",
+			"program": "${workspaceFolder}/pa6",
 			"args": ["Select"],
 			"externalConsole": false,
 			"preLaunchTask": "clang++ build active file",

@@ -155,7 +155,10 @@ namespace ECE141 {
       else if(isOperator(theChar)) {
         std::string temp;
         Token theToken{TokenType::operators};
-        theToken.data.push_back(input.get());
+        //char theFirstOpr = input.get();
+        theToken.data = readWhile(isOperator);
+        // theToken.data.push_back(input.get());
+        // Check if the next char is also a operator
         theToken.op=gOperators[temp];
         tokens.push_back(theToken);
       }

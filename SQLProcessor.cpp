@@ -215,14 +215,14 @@ bool checkSelectTable(Tokenizer aTokenizer) {
         } else {
             // check if we have like this identifier_kw,identifier_kw,identifier_kw
             if (!checkSelect) {
-                int tokenIdx = 1;
-                while (!checkSelect && aTokenizer.more() && aTokenizer.peek(tokenIdx + 1).data != "from") {
+                //int tokenIdx = 1;
+                while (!checkSelect && aTokenizer.more() && aTokenizer.peek(2).data != "from") {
                     aTokenizer.next();
                     if (aTokenizer.current().type != TokenType::identifier) {
                         return false;
                     }
                     aTokenizer.skipTo(',');
-                    tokenIdx = aTokenizer.getIndex() + 1;
+                   // tokenIdx = aTokenizer.getIndex() + 1;
                 }
                 checkSelect = true;
                 aTokenizer.next();
@@ -387,7 +387,8 @@ Statement *SQLProcessor::handleSqlStatements(Tokenizer &aTokenizer) {
             return theInsertTable;
         }
         case Keywords::select_kw: {
-            aTokenizer.skipTo(TokenType::identifier);
+            aTokenizer.skipTo(Keywords::from_kw);
+            aTokenizer.next();
             Block    theDescribeBlock;
             uint32_t theBlockNum = (*currentActiveDbPtr)->getEntityFromMap(aTokenizer.current().data);
             (*currentActiveDbPtr)->getStorage().readBlock(theBlockNum, theDescribeBlock);
@@ -402,6 +403,7 @@ Statement *SQLProcessor::handleSqlStatements(Tokenizer &aTokenizer) {
             // Atul added
             aTokenizer.restart();
             StatusResult theStatus = theSelectStatememt->parseStatement(aTokenizer);
+            delete theEntity;
             return theSelectStatememt;
         }
         default:

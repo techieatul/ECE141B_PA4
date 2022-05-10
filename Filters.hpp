@@ -49,6 +49,12 @@ namespace ECE141 {
       : lhs(aLHSOperand), rhs(aRHSOperand),
         op(anOp), logic(Logical::no_op) {}
     
+    Expression(Operand &aLHSOperand, Operators anOp,
+               Operand &aRHSOperand,Logical &alogical)
+      : lhs(aLHSOperand), rhs(aRHSOperand),
+        op(anOp), logic(alogical) {}
+
+
     bool operator()(KeyValues &aList);
   };
   

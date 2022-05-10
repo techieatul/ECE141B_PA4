@@ -128,7 +128,7 @@ bool Database::selectRows(DBQuery &aDB, Entity &anEntity,std::ostream &anOutput)
     //Push the primary key first if it exists
     const Attribute* thePrimaryAttr = anEntity.getPrimaryKey();
     if(thePrimaryAttr != nullptr){
-        aDB.setAttr(thePrimaryAttr->getName());
+        aDB.setAttrPrimary(thePrimaryAttr->getName());
     }
     if(aDB.getAllField()){
         AttributeList theAttr = anEntity.getAttributes();
@@ -155,17 +155,24 @@ bool Database::selectRows(DBQuery &aDB, Entity &anEntity,std::ostream &anOutput)
 void Database::filterRows(DBQuery &aDB,RawRowCollection &theRow,RawRowCollection &theFilteredRow){
     theFilteredRow.assign(theRow.begin(),theRow.end());
     FilterRow* theFilter = new FilterRow();
-    
-    if(aDB.getFilter().getCount()>0){
-        theFilter->filterWhere(aDB,theFilteredRow);
+    FilterKeyword theFilterKey = aDB.getFilterKey();
+    for(auto &thekey : theFilterKey){
+        switch (thekey){
+            case Keywords::where_kw:
+                 theFilter->filterWhere(aDB,theFilteredRow);
+                 break;
+            case Keywords::order_kw:
+                 theFilter->filterOrderBy(aDB,theFilteredRow);
+                 break;
+            case Keywords::limit_kw:
+                 theFilter->filterLimit(aDB,theFilteredRow);
+                 break;
+            default:
+                continue;
+                 
+        }
+
     }
-    if(aDB.getOrderBy() != ""){
-        theFilter->filterOrderBy(aDB,theFilteredRow);
-    }
-
-    
-
-
     delete theFilter;
     
 }

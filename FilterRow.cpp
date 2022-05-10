@@ -47,4 +47,9 @@ namespace ECE141{
         return *this;
     }
 
+    FilterRow& FilterRow::filterLimit(DBQuery &aDB,RawRowCollection &theFilteredRow){
+        theFilteredRow.erase(theFilteredRow.begin()+aDB.getLimit(),theFilteredRow.end());
+        return *this;
+    }
+
 } 

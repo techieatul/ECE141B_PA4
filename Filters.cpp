@@ -197,7 +197,7 @@ namespace ECE141 {
     // Do the logic here
     for(const auto &it: theLogicalOpr){
       if(stackOpr.count(it)) {
-        stackOpr[it];
+        stackOpr[it](theValStack);
       }else{
         return false;
       }
@@ -233,6 +233,8 @@ namespace ECE141 {
     else if(TokenType::number==theToken.type) {
       anOperand.ttype=TokenType::number;
       anOperand.dtype=DataTypes::int_type;
+      anOperand.entityId=Helpers::hashString(theEntityName.c_str());
+      anOperand.entityName = theEntityName;
       if (theToken.data.find('.')!=std::string::npos) {
         anOperand.dtype=DataTypes::float_type;
         anOperand.value=std::stof(theToken.data);
@@ -256,7 +258,12 @@ namespace ECE141 {
     }
     return false;
   }
-
+  StatusResult isLogicalKeyword(Keywords &aKeyWord){
+    if(aKeyWord == Keywords::and_kw || aKeyWord == Keywords::and_kw || aKeyWord == Keywords::not_kw){
+      return StatusResult(Errors::noError);
+    }
+    return StatusResult(Errors::unknownError);
+  }
   //STUDENT: This starting point code may need adaptation...
   StatusResult Filters::parse(Tokenizer &aTokenizer,Entity &anEntity) {
     StatusResult  theResult{noError};
@@ -272,7 +279,16 @@ namespace ECE141 {
           aTokenizer.next();
           if((theResult=parseOperand(aTokenizer,anEntity,theRHS))) {
             if(validateOperands(theLHS, theRHS, anEntity)) {
-              add(new Expression(theLHS, theOp, theRHS));
+              // Added code to check if we have any logical operator
+             // if(aTokenizer.peek(1).keyword == Keywords::)
+             if(isLogicalKeyword(aTokenizer.current().keyword)){
+               Logical theLogicalOpr = Helpers::convertKeyWordToLogical(aTokenizer.current().keyword);
+               aTokenizer.next();
+               add(new Expression(theLHS, theOp, theRHS,theLogicalOpr));
+             }else{
+               add(new Expression(theLHS, theOp, theRHS));
+             }
+              
               if(aTokenizer.skipIf(semicolon)) {
                 break;
               }
@@ -287,6 +303,7 @@ namespace ECE141 {
   }
 
 }
+
 
 
 // if(it == Logical::and_op){

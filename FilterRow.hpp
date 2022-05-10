@@ -15,7 +15,7 @@ class FilterRow {
     FilterRow();
     ~FilterRow();
     FilterRow& filterOrderBy(DBQuery &aDB,RawRowCollection &theFilteredRow);
-    FilterRow& filterLimit();
+    FilterRow& filterLimit(DBQuery &aDB,RawRowCollection &theFilteredRow);
     FilterRow& filterWhere(DBQuery &aDB,RawRowCollection &theFilteredRow);
 };
 
