@@ -9,6 +9,7 @@
 #include "Tokenizer.hpp"
 #include "Helpers.hpp"
 #include <exception>
+#include <algorithm>
 
 namespace ECE141 {
   
